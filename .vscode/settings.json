@@ -1,14 +1,5 @@
 {
     "files.associations": {
-        "typeinfo": "cpp",
-        "*.tcc": "cpp",
-        "string": "cpp",
-        "istream": "cpp",
-        "ostream": "cpp",
-        "io": "cpp",
-        "array": "cpp",
-        "string_view": "cpp",
-        "deque": "cpp",
-        "vector": "cpp"
+        "ostream": "cpp"
     }
 }

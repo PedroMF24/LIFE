@@ -1,4 +1,3 @@
-
 void graph() {
 
     /*
@@ -10,8 +9,8 @@ void graph() {
      * To fit to data, fit = 1;
     */
 
-    string path = "data/test.csv";  // input file path
-    string name = "Teste";          // Graph title
+    string path = "data/Espectroscopia/financas_test.csv";  // input file path
+    string name = "financas";       // Graph title
     string titleX = "Ola";          // X axis title
     string titleY = "Adeus";        // Y axis title
     string dir = "bin/";            // output file folder
@@ -36,7 +35,7 @@ void graph() {
         getline(file,s);
         stringstream titles(s);
         string title;
-        while (getline(titles, title, ','))
+        while (getline(titles, title, ';'))
             cout << title << '\t';
         cout << endl;
     }
@@ -53,7 +52,7 @@ void graph() {
         int jj = 0;
         stringstream line(s); // turns string into sstream
         string word;
-        while (getline(line, word, ',')) {
+        while (getline(line, word, ';')) {
             data[jj].push_back(stod(word));
             jj++;
         }
@@ -73,6 +72,18 @@ void graph() {
     // Make graph
     TCanvas *c = new TCanvas();
     TGraphErrors *gr = new TGraphErrors(data[1].size(), &(data[0][0]), &(data[1][0]), &(data[2][0]), &(data[3][0])); // Time vs Channel
+
+    if (fit) {
+        TF1* func = new TF1("func","gaus");
+        cout << "Making fit...\n";
+        func->SetLineColor(kRed);
+        func->SetLineWidth(2);
+        gr->Fit("func");
+        gr->SetMarkerColor(0);
+        gr->SetMarkerStyle(9);
+        gr->SetMarkerSize(0.1);
+        func->Draw("SAME");
+    }
 
     gr->GetXaxis()->CenterTitle();
     gr->SetTitle(name.c_str());
