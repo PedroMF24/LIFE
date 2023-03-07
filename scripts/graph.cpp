@@ -9,13 +9,13 @@ void graph() {
      * To fit to data, fit = 1;
     */
 
-    string path = "data/Espectroscopia/financas_test.csv";  // input file path
-    string name = "financas";       // Graph title
-    string titleX = "Ola";          // X axis title
-    string titleY = "Adeus";        // Y axis title
+    string path = "data/Espectroscopia/h_planck.csv";  // input file path
+    string name = "Planck's Constant";       // Graph title
+    string titleX = "#nu [Hz]";          // X axis title
+    string titleY = "V_{s} [V]";        // Y axis title
     string dir = "bin/";            // output file folder
-    string func_name = "Func";      // Fit function
-    int print = 1;
+    string fitfunction = "[0]*x+[1]";      // Fit function
+    int print = 0;
     int save = 1;
     int fit = 1;
 
@@ -74,14 +74,14 @@ void graph() {
     TGraphErrors *gr = new TGraphErrors(data[1].size(), &(data[0][0]), &(data[1][0]), &(data[2][0]), &(data[3][0])); // Time vs Channel
 
     if (fit) {
-        TF1* func = new TF1("func","gaus");
+        TF1* func = new TF1("func", fitfunction.c_str());
         cout << "Making fit...\n";
         func->SetLineColor(kRed);
         func->SetLineWidth(2);
         gr->Fit("func");
-        gr->SetMarkerColor(0);
-        gr->SetMarkerStyle(9);
-        gr->SetMarkerSize(0.1);
+        // gr->SetMarkerColor(0);
+        // gr->SetMarkerStyle(9);
+        // gr->SetMarkerSize(0.1);
         func->Draw("SAME");
     }
 
@@ -89,9 +89,11 @@ void graph() {
     gr->SetTitle(name.c_str());
     gr->GetXaxis()->SetTitle(titleX.c_str());
     gr->GetYaxis()->SetTitle(titleY.c_str());
+    gr->SetMarkerColor(kBlue);
+    gr->SetMarkerStyle(20); // 20
     gr->SetLineColor(kBlue);
-    gr->SetLineWidth(2);
-    gr->Draw();
+    // gr->SetLineWidth(2);
+    gr->Draw("AP");
 
     // Save graph in bin dir
     if (save) {
