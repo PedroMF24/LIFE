@@ -9,20 +9,20 @@ void graph() {
      * To fit to data, fit = 1;
     */
 
-    // string path = "data/Espectroscopia/deltaxphii.csv";  // input file path
-    string path = "data/Optica/indice_refraccao_fcurva.csv";  // input file path
+    string path = "data/Espectroscopia/h_planck.csv";  // input file path
+    // string path = "data/MOOC/TL_linear.csv";  // input file path
 
-    string name = "Refraction index (C)";       // Graph title
-    // string name = "1/T_{carga}(I)";       // Graph title
-
-    string titleX = "sin(#theta_{i}) [rad]";          // X axis title
-    // string titleX = "I [%]";          // X axis title
-
-    string titleY = "sin(#theta_{t}) [rad]";        // Y axis title
-    // string titleY = "1/T [1/s]";        // Y axis title
-
+    string name = "MOOC";       // Graph title
+    string titleX = "#nu [Hz]";          // X axis title
+    string titleY = "V_{s} [V]";        // Y axis title
     string dir = "bin/";            // output file folder
-    string fitfunction = "pol1"; // "[0]*x+[1]";      // Fit function
+    string fitfunction = "[0]*x+[1]";      // Fit function
+    // string name = "MOOC";       // Graph title
+    // string titleX = "#\\sqrt{\\frac{L}{g}}  [s]"; // "L [m]"; //  //"#\\sqrt{L/g} [s]";       // X axis title
+    // string titleY = "T [s]";        // Y axis title
+    // string dir = "bin/";            // output file folder
+    // string fitfunction = "[0]*x+[1]";      // Fit function
+    // "[0]*x*x + [1]*x + [2]"
     int print = 0;
     int save = 1;
     int fit = 1;
@@ -82,12 +82,10 @@ void graph() {
     TGraphErrors *gr = new TGraphErrors(data[1].size(), &(data[0][0]), &(data[1][0]), &(data[2][0]), &(data[3][0])); // Time vs Channel
 
     if (fit) {
-        TF1* func = new TF1("func", fitfunction.c_str()); // 
+        TF1* func = new TF1("func", fitfunction.c_str());
         cout << "Making fit...\n";
         func->SetLineColor(kRed);
         func->SetLineWidth(2);
-        // func->SetParNames("c", "b", "a");
-        // func->SetParameters(0,1,1);
         gr->Fit("func");
         // gr->SetMarkerColor(0);
         // gr->SetMarkerStyle(9);
@@ -109,7 +107,6 @@ void graph() {
     if (save) {
         dir.append(name);
         dir.append(".png");
-        cout << "Saving in " << dir << endl;
         c->Update();
         c->SaveAs(dir.c_str());
     }

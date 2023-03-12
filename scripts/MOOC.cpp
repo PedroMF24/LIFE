@@ -1,4 +1,4 @@
-void graph() {
+void MOOC() {
 
     /*
      * HOW TO USE
@@ -10,22 +10,22 @@ void graph() {
     */
 
     // string path = "data/Espectroscopia/deltaxphii.csv";  // input file path
-    string path = "data/Optica/indice_refraccao_fcurva.csv";  // input file path
+    string path = "data/MOOC/ratio.csv";  // input file path
 
-    string name = "Refraction index (C)";       // Graph title
+    string name = "Ratio of Periods";       // Graph title
     // string name = "1/T_{carga}(I)";       // Graph title
 
-    string titleX = "sin(#theta_{i}) [rad]";          // X axis title
+    string titleX = "L [m]";       // X axis title // #sqrt(#frac{L}{g}) [s] // #sqrt{#frac{L}{g}} [s]
     // string titleX = "I [%]";          // X axis title
 
-    string titleY = "sin(#theta_{t}) [rad]";        // Y axis title
+    string titleY = "#frac{T_{A}}{T_{B}}";        // Y axis title // "#frac{T_{A}}{T_{B}}"
     // string titleY = "1/T [1/s]";        // Y axis title
 
-    string dir = "bin/";            // output file folder
-    string fitfunction = "pol1"; // "[0]*x+[1]";      // Fit function
+    string dir = "bin/MOOC/";            // output file folder
+    string fitfunction = "pol0"; // "[0]*x+[1]";      // Fit function
     int print = 0;
     int save = 1;
-    int fit = 1;
+    int fit = 0;
 
     // Vector to store the CSV data
     vector<vector<double>> data; 
@@ -78,7 +78,7 @@ void graph() {
     }
 
     // Make graph
-    TCanvas *c = new TCanvas();
+    TCanvas *c = new TCanvas("c", "canvas", 1200, 600);
     TGraphErrors *gr = new TGraphErrors(data[1].size(), &(data[0][0]), &(data[1][0]), &(data[2][0]), &(data[3][0])); // Time vs Channel
 
     if (fit) {
@@ -105,12 +105,27 @@ void graph() {
     // gr->SetLineWidth(2);
     gr->Draw("AP");
 
+    // TF1* fa1 = new TF1("fa1", "2*acos(-1)*x", 0.36, 0.4);
+    // fa1->SetLineColor(kOrange);
+    // fa1->SetLineWidth(2);
+    // fa1->Draw("SAME");
+
+    // TF1* fa1 = new TF1("fa1", "2*acos(0)*x", 0.375, 0.395); // , 0.375, 0.395
+
+    // fa1->GetXaxis()->SetRange(0.375, 0.395);
+    // TLine *line = new TLine(0.3756,2.359,0.3971,2.4950);
+    TLine *line = new TLine(1.37,1,1.565,1);
+    line->SetLineColor(kOrange);
+    line->SetLineWidth(2);
+    line->Draw("SAME");
+
+
+    c->Update();
     // Save graph in bin dir
     if (save) {
         dir.append(name);
         dir.append(".png");
         cout << "Saving in " << dir << endl;
-        c->Update();
         c->SaveAs(dir.c_str());
     }
 }

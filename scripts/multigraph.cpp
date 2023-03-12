@@ -1,4 +1,4 @@
-void graph() {
+void multigraph() {
 
     /*
      * HOW TO USE
@@ -9,23 +9,16 @@ void graph() {
      * To fit to data, fit = 1;
     */
 
-    // string path = "data/Espectroscopia/deltaxphii.csv";  // input file path
-    string path = "data/Optica/indice_refraccao_fcurva.csv";  // input file path
-
-    string name = "Refraction index (C)";       // Graph title
-    // string name = "1/T_{carga}(I)";       // Graph title
-
-    string titleX = "sin(#theta_{i}) [rad]";          // X axis title
-    // string titleX = "I [%]";          // X axis title
-
-    string titleY = "sin(#theta_{t}) [rad]";        // Y axis title
-    // string titleY = "1/T [1/s]";        // Y axis title
-
+    string path = "data/MOOC/isocronocidade.csv";  // input file path
+    string name = "Planck's Constant";       // Graph title
+    string titleX = "#nu [Hz]";          // X axis title
+    string titleY = "V_{s} [V]";        // Y axis title
     string dir = "bin/";            // output file folder
-    string fitfunction = "pol1"; // "[0]*x+[1]";      // Fit function
+    string fitfunction = "[0]*x+[1]";      // Fit function
     int print = 0;
     int save = 1;
-    int fit = 1;
+    int fit = 0;
+    int fit_bit = 0; // Chooses which graoh to fit, fit_bit < N ALWAYS
 
     // Vector to store the CSV data
     vector<vector<double>> data; 
@@ -39,18 +32,26 @@ void graph() {
 
     // Discard and/or write title
     string s;
+    int N = 0;
     for (int i=0; i<1; i++) {
         getline(file,s);
         stringstream titles(s);
         string title;
-        while (getline(titles, title, ';'))
+        while (getline(titles, title, ';')) {
             cout << title << '\t';
+            N++; // N columns
+        }
         cout << endl;
+    }
+
+    if (N%2 != 0) {
+        fprintf(stderr, "**Odd number of columns, exit\n");
+        exit(0);
     }
 
     // Initializes the data storage
     vector<vector<double>> vec;
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < N; i++){
         vector<double> vec;
         data.push_back(vec);
     }
@@ -79,37 +80,42 @@ void graph() {
 
     // Make graph
     TCanvas *c = new TCanvas();
-    TGraphErrors *gr = new TGraphErrors(data[1].size(), &(data[0][0]), &(data[1][0]), &(data[2][0]), &(data[3][0])); // Time vs Channel
-
-    if (fit) {
-        TF1* func = new TF1("func", fitfunction.c_str()); // 
+    vector<TGraph *> grvec;
+    TMultiGraph *mg = new TMultigraph();
+    N *= 0.5; // Create a graoh for each pair of columns
+    for (int i = 0; i < N; i+=2) {
+        TGraph *gr = new TGraph(data[i+1].size(), &(data[i][0]), &(data[i+1][0]));
+        grvec[i].push_back(gr);
+        grvec[i]->SetMarkerColor(i+1);
+        grvec[i]->SetMarkerStyle(20); // 20
+        // grvec[i]->SetLineColor(kBlue);
+        mg->Add(grvec[i]);
+    }
+    
+    if (fit && fit_bit < N) {
+        TF1* func = new TF1("func", fitfunction.c_str());
         cout << "Making fit...\n";
         func->SetLineColor(kRed);
         func->SetLineWidth(2);
-        // func->SetParNames("c", "b", "a");
-        // func->SetParameters(0,1,1);
-        gr->Fit("func");
+        grvec[fit_bit]->Fit("func");
         // gr->SetMarkerColor(0);
         // gr->SetMarkerStyle(9);
         // gr->SetMarkerSize(0.1);
         func->Draw("SAME");
     }
 
-    gr->GetXaxis()->CenterTitle();
-    gr->SetTitle(name.c_str());
-    gr->GetXaxis()->SetTitle(titleX.c_str());
-    gr->GetYaxis()->SetTitle(titleY.c_str());
-    gr->SetMarkerColor(kBlue);
-    gr->SetMarkerStyle(20); // 20
-    gr->SetLineColor(kBlue);
+    mg->GetXaxis()->CenterTitle();
+    mg->SetTitle(name.c_str());
+    mg->GetXaxis()->SetTitle(titleX.c_str());
+    mg->GetYaxis()->SetTitle(titleY.c_str());
+
     // gr->SetLineWidth(2);
-    gr->Draw("AP");
+    mg->Draw("AP");
 
     // Save graph in bin dir
     if (save) {
         dir.append(name);
-        dir.append(".png");
-        cout << "Saving in " << dir << endl;
+        dir.append("2.png");
         c->Update();
         c->SaveAs(dir.c_str());
     }
